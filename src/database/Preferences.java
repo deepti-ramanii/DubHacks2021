@@ -1,3 +1,5 @@
+package database;
+
 public class Preferences {
     public int minAge;
     public int maxAge;
