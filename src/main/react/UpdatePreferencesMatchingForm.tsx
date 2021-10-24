@@ -91,10 +91,10 @@ class UpdatePreferencesMatchingForm extends Component<UpdatePrefsMatchingFormPro
         }
         let responsePath = await response.json();
         const playerMatch = JSON.stringify(responsePath);
-        if (playerMatch === 'true') {
+        if (playerMatch != 'null') {
             alert('Successfully matched with ' + playerMatch);
         } else {
-            alert('No matches found.');
+            alert('Matching...');
         }
     };
 

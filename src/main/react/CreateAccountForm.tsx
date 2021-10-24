@@ -90,12 +90,38 @@ class CreateAccountForm extends Component<CreateAccountFormProps, CreateAccountF
         alert('Successfully logged in. Welcome, ' + this.state.user_id);
     };
 
+    GetUser = async ()  => {
+        let response = await fetch('http://localhost:4567/check-user?user_id=' + this.state.user_id);
+        if (!response.ok) {
+            alert("The status is wrong! Expected: 200, Was: " + response.status);
+            return;
+        }
+        let responsePath = await response.json();
+        const successful = JSON.stringify(responsePath);
+        if (successful != 'true') {
+            alert('Username not found.');
+            return;
+        }
+        this.props.updateUserID(this.state.user_id, true);
+        alert('Successfully logged in. Welcome, ' + this.state.user_id);
+    }
+
     // RENDERING METHODS ---------------------------------------------------------------------------
     render() {
         return (
             <div>
+                <div id="login">
+                    <span>Log in with existing User ID: </span>
+                    <div id="existing_id_info">
+                        <UserIDInput user_id={this.state.user_id} setUID={this.setUserId}/>
+                        <button onClick={this.GetUser}>Log In</button>
+                    </div>
+                </div>
+                <div id="or">
+                    <span> OR </span>
+                </div>
                 <div id="user_info">
-                    <span>Information:</span>
+                    <span>Create Account:</span>
                 </div>
                 <div id="id_info">
                     <UserIDInput user_id={this.state.user_id} setUID={this.setUserId}/>

@@ -22,6 +22,20 @@ public class SparkServer {
 
         gson = new Gson();
 
+        Spark.get("/check-user", new Route() {
+            @Override
+            public Object handle(Request request, Response response) throws Exception {
+                // get input and check validity
+                String user_id = request.queryParams("user_id");
+                if (user_id == null) {
+                    Spark.halt(400, "user id must be valid");
+                }
+
+                boolean getUserSuccessful = dbHelper.isInTable(user_id);
+                return gson.toJson(getUserSuccessful);
+            }
+        });
+
         //query looks like /add-user?user_id=ID&player_age=AGE&competitive=COMPETITIVE&uses_vc=USESVC&likes_anime=LIKESANIME
         Spark.get("/add-user", new Route() {
             @Override
