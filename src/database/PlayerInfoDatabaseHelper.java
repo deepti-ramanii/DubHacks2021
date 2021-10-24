@@ -21,8 +21,8 @@ public class PlayerInfoDatabaseHelper {
     // player pref columns
     public static final String MIN_AGE_PREF = "min_age_pref";                                       // minimum age preferred (default: 0)
     public static final String MAX_AGE_PREF = "max_age_pref";                                       // max age preferred (default: 255)
-    public static final String[] PLAYSTYLE_PREFS = { "competitive_pref", "uses_vc_pref" };          // bit array of player playstyle preferences
-    public static final String MATCH_USING_HOBBIES = "match_using_hobbies";                         // if true, match based on hobbies
+    public static final String[] PLAYSTYLE_PREFS = { "competitive_pref", "uses_vc_pref" };          // array of player playstyle preferences (default: false)
+    public static final String MATCH_USING_HOBBIES = "match_using_hobbies";                         // matching type preferred (default: false)
 
     // connection to server where database is located
     private static Connection connection = null;
@@ -47,8 +47,11 @@ public class PlayerInfoDatabaseHelper {
     public static void connect() {
         String URL = "jdbc:mysql://" + SERVER_NAME + "/" + DATABASE_NAME;
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(URL, SERVER_USERNAME, SERVER_PASSWORD);
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -74,11 +77,13 @@ public class PlayerInfoDatabaseHelper {
             PreparedStatement statement = connection.prepareStatement(checkIDExistsQuery);
             statement.setString(1, user_id);
             ResultSet resultSet = statement.executeQuery();
-            return (resultSet.getInt(1) > 0);
+            if(resultSet.next()) {
+                return (resultSet.getInt(1) > 0);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     // add user id to table  w/ associated preferences set to null
@@ -94,7 +99,7 @@ public class PlayerInfoDatabaseHelper {
                                       PLAYER_PLAYSTYLE[0] + "," +
                                       PLAYER_PLAYSTYLE[1] + "," +
                                       PLAYER_HOBBIES[0] + ")" +
-                               " VALUES (?,?,?,?)";
+                               " VALUES (?,?,?,?,?)";
         try {
             PreparedStatement statement = connection.prepareStatement(insertIDQuery);
             statement.setString(1, user_id);
@@ -136,6 +141,7 @@ public class PlayerInfoDatabaseHelper {
             }
             statement.setBoolean(3 + PLAYSTYLE_PREFS.length, user_prefs.matchUsingHobbies);
             statement.setString(4 + PLAYSTYLE_PREFS.length, user_id);
+            statement.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -159,12 +165,12 @@ public class PlayerInfoDatabaseHelper {
             PreparedStatement statement = connection.prepareStatement(updateInfoQuery);
             statement.setInt(1, user_info.age);
             for (int i = 0; i < PLAYER_PLAYSTYLE.length; i++) {
-                statement.setBoolean(3  + i, user_info.playstyleInfo[i]);
+                statement.setBoolean(2  + i, user_info.playstyleInfo[i]);
             }
             for (int i = 0; i < PLAYER_HOBBIES.length; i++) {
-                statement.setBoolean(3 + PLAYER_PLAYSTYLE.length + i, user_info.hobbyInfo[i]);
+                statement.setBoolean(2 + PLAYER_PLAYSTYLE.length + i, user_info.hobbyInfo[i]);
             }
-            statement.setString(4, user_id);
+            statement.setString(2 + PLAYER_PLAYSTYLE.length + PLAYER_HOBBIES.length, user_id);
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -191,18 +197,20 @@ public class PlayerInfoDatabaseHelper {
             statement.setString(1, user_id);
 
             ResultSet resultSet = statement.executeQuery();
-            int minAge = resultSet.getInt(1);
-            int maxAge = resultSet.getInt(2);
-            boolean[] playstylePrefs = new boolean[PLAYSTYLE_PREFS.length];
-            for (int i = 0; i < PLAYSTYLE_PREFS.length; i++) {
-                playstylePrefs[i] = resultSet.getBoolean(3  + i);
+            if (resultSet.next()) {
+                int minAge = resultSet.getInt(1);
+                int maxAge = resultSet.getInt(2);
+                boolean[] playstylePrefs = new boolean[PLAYSTYLE_PREFS.length];
+                for (int i = 0; i < PLAYSTYLE_PREFS.length; i++) {
+                    playstylePrefs[i] = resultSet.getBoolean(3 + i);
+                }
+                boolean matchUsingHobbies = resultSet.getBoolean(3 + PLAYSTYLE_PREFS.length);
+                return new UserPreferences(minAge, maxAge, playstylePrefs, matchUsingHobbies);
             }
-            boolean matchUsingHobbies = resultSet.getBoolean(3 + PLAYSTYLE_PREFS.length);
-            return new UserPreferences(minAge, maxAge, playstylePrefs, matchUsingHobbies);
         } catch (SQLException e)  {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 
     // returns info associated with given user id
@@ -222,19 +230,21 @@ public class PlayerInfoDatabaseHelper {
             statement.setString(1, user_id);
 
             ResultSet resultSet = statement.executeQuery();
-            int age = resultSet.getInt(1);
-            boolean[] playstyleInfo = new boolean[PLAYER_PLAYSTYLE.length];
-            for (int i = 0; i < PLAYER_PLAYSTYLE.length; i++) {
-                playstyleInfo[i] = resultSet.getBoolean(2  + i);
+            if (resultSet.next()) {
+                int age = resultSet.getInt(1);
+                boolean[] playstyleInfo = new boolean[PLAYER_PLAYSTYLE.length];
+                for (int i = 0; i < PLAYER_PLAYSTYLE.length; i++) {
+                    playstyleInfo[i] = resultSet.getBoolean(2 + i);
+                }
+                boolean[] hobbyInfo = new boolean[PLAYER_HOBBIES.length];
+                for (int i = 0; i < PLAYER_HOBBIES.length; i++) {
+                    hobbyInfo[i] = resultSet.getBoolean(2 + PLAYER_PLAYSTYLE.length + i);
+                }
+                return new UserInfo(age, playstyleInfo, hobbyInfo);
             }
-            boolean[] hobbyInfo = new boolean[PLAYER_HOBBIES.length];
-            for (int i = 0; i < PLAYER_HOBBIES.length; i++) {
-                hobbyInfo[i] = resultSet.getBoolean(2 + PLAYER_PLAYSTYLE.length + i);
-            }
-            return new UserInfo(age, playstyleInfo, hobbyInfo);
         } catch (SQLException e)  {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 }
