@@ -5,7 +5,6 @@ import components.PlayerMatcher;
 public class TestDatabase {
     public static void main(String[] args) {
         PlayerInfoDatabaseHelper dbHelper = PlayerInfoDatabaseHelper.getInstance();
-        PlayerMatcher matcher = new PlayerMatcher();
 
         // test adding into database, normal case
         UserInfo aa_info = new UserInfo(15, new boolean[] {true, true}, new boolean[] {true});

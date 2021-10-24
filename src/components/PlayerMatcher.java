@@ -12,9 +12,6 @@ public class PlayerMatcher {
     // store all players waiting for a match (queue -> first player is
     public Set<String> waitingPlayersUsingPrefs =  new HashSet<String>();
 
-    // store all players who want random matching (priority queue: first added = first to match)
-    public Queue<String> waitingPlayersNoPrefs = new LinkedList<String>();
-
     // returns the id of the other player to match with if there's a good match,
     // returns null otherwise
     public String matchUsingPrefs(String currPlayerID) {
@@ -23,7 +20,7 @@ public class PlayerMatcher {
         UserPreferences currPrefs = playerInfoDB.getPreferences(currPlayerID);
 
         // get match levels
-        TreeMap<Float, String> matchLevels =  new TreeMap<Float, String>();
+        TreeMap<Float, String> matchLevels =  new TreeMap<Float, String>(Collections.reverseOrder());
 
         // compare against other players waiting for matches
         for (String otherPlayerID : waitingPlayersUsingPrefs) {
@@ -34,10 +31,18 @@ public class PlayerMatcher {
             float numTotalPrefs  = 1 + currInfo.playstyleInfo.length + (currPrefs.matchUsingHobbies ? currInfo.hobbyInfo.length : 0);
 
             // check age
-            if (currInfo.age < otherPrefs.maxAge && currInfo.age > otherPrefs.minAge) {
+            if (currInfo.age > otherPrefs.maxAge) {
+                numMatchingPrefs += (0.4f * otherPrefs.maxAge / currInfo.age);
+            } else if (currInfo.age < otherPrefs.minAge) {
+                numMatchingPrefs += (0.4f * currInfo.age / otherPrefs.minAge);
+            } else {
                 numMatchingPrefs += 0.5f;
             }
-            if (otherInfo.age < currPrefs.maxAge && otherInfo.age > currPrefs.minAge) {
+            if (otherInfo.age > currPrefs.maxAge) {
+                numMatchingPrefs += (0.4f * currPrefs.maxAge / otherInfo.age);
+            } else if (otherInfo.age < currPrefs.minAge) {
+                numMatchingPrefs += (0.4f * otherInfo.age / currPrefs.minAge);
+            } else {
                 numMatchingPrefs += 0.5f;
             }
 
@@ -52,7 +57,7 @@ public class PlayerMatcher {
             }
 
             // check hobby matching
-            for (int i = 0; i < currPrefs.playstylePrefs.length; i++) {
+            for (int i = 0; i < currInfo.hobbyInfo.length; i++) {
                 if (currPrefs.matchUsingHobbies && currInfo.hobbyInfo[i] == otherInfo.hobbyInfo[i])  {
                     numMatchingPrefs += 1.0f;
                 }
