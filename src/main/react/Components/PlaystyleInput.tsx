@@ -17,11 +17,13 @@ class PlaystyleInput extends Component<PlaystyleProps> {
     render() {
         return (
             <div className="imagerow">
+                <span>Competitive: </span>
                 <input
                     type="checkbox"
                     onChange={this.onCompetitiveChange}
                     defaultChecked={false}
                 />
+                <span> Use VC: .</span>
                 <input
                     type="checkbox"
                     onChange={this.onUsesVCChange}

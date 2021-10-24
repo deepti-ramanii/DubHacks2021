@@ -12,10 +12,13 @@ class UserIDInput extends Component<UserIDProps> {
 
     render() {
         return (
+            <div  id="user_id">
+                <span> Enter an ID: </span>
                 <input
                     value={this.props.user_id}
                     onChange={this.onUIDChange}
                 />
+            </div>
         )
     }
 }

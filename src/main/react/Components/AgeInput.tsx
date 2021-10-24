@@ -12,10 +12,13 @@ class AgeInput extends Component<AgeProps> {
 
     render() {
         return (
-            <input
-                value={this.props.player_age}
-                onChange={this.onAgeChange}
-            />
+            <div id="age">
+                <span>Enter your age: </span>
+                <input
+                    value={this.props.player_age}
+                    onChange={this.onAgeChange}
+                />
+            </div>
         )
     }
 }

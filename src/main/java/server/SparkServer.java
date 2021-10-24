@@ -39,10 +39,7 @@ public class SparkServer {
                 // try adding to table
                 UserInfo user_info = new UserInfo(age, new  boolean[] { competitive, uses_vc }, new boolean[] { likes_anime });
                 boolean addUserSuccessful = dbHelper.addUser(user_id, user_info);
-                if (!addUserSuccessful) {
-                    Spark.halt(400, "user id already taken");
-                }
-                return gson.toJson("Added user!");
+                return gson.toJson(addUserSuccessful);
             }
         });
 
@@ -64,10 +61,7 @@ public class SparkServer {
                 // try adding to table
                 UserPreferences user_prefs = new UserPreferences(min_age, max_age, new boolean[] { competitive, uses_vc }, use_hobbies);
                 boolean updatePrefsSuccessful = dbHelper.updatePreferences(user_id, user_prefs);
-                if (!updatePrefsSuccessful) {
-                    Spark.halt(400, "couldn't find user");
-                }
-                return null;
+                return gson.toJson(updatePrefsSuccessful);
             }
         });
 
@@ -88,10 +82,7 @@ public class SparkServer {
                 // try adding to table
                 UserInfo user_info = new UserInfo(age, new  boolean[] { competitive, uses_vc }, new boolean[] { likes_anime });
                 boolean updateInfoSuccessful = dbHelper.updateInfo(user_id, user_info);
-                if (!updateInfoSuccessful) {
-                    Spark.halt(400, "couldn't find user");
-                }
-                return null;
+                return gson.toJson(updateInfoSuccessful);
             }
         });
 
@@ -106,9 +97,6 @@ public class SparkServer {
 
                 // try getting a match
                 String foundMatch = matcher.matchUsingPrefs(user_id);
-                if (foundMatch ==  null) {
-                    Spark.halt(400, "no match found");
-                }
                 return gson.toJson(foundMatch);
             }
         });
