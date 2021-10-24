@@ -1,15 +1,22 @@
 package database;
 
+import java.util.Arrays;
+
 // store info about player preferences
 public class UserPreferences {
     public int minAge;
     public int maxAge;
+    public boolean[] playstylePrefs; // [competitive, usesVC]
+    public boolean matchUsingHobbies;
 
-    public int difficulty;
-
-    public UserPreferences(int minAge, int maxAge, int difficulty) {
+    public UserPreferences(int minAge, int maxAge, boolean[] playstylePrefs, boolean matchUsingHobbies) {
         this.minAge = minAge;
         this.maxAge = maxAge;
-        this.difficulty = difficulty;
+        this.playstylePrefs = playstylePrefs;
+        this.matchUsingHobbies = matchUsingHobbies;
+    }
+
+    public boolean equals(UserPreferences other) {
+        return (this.minAge == other.minAge && this.maxAge == other.maxAge && Arrays.equals(this.playstylePrefs, other.playstylePrefs) && this.matchUsingHobbies == other.matchUsingHobbies);
     }
 }
