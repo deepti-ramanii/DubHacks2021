@@ -1,4 +1,0 @@
-rootProject.name = 'dubhacks2021'
-
-include 'server'
-

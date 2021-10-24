@@ -1,27 +1,35 @@
+/*
+ * Copyright (C) 2021 Hal Perkins.  All rights reserved.  Permission is
+ * hereby granted to students registered for University of Washington
+ * CSE 331 for use solely during Winter Quarter 2021 for purposes of
+ * the course.  No other use, copying, distribution, or modification
+ * is permitted without prior written consent. Copyrights for
+ * third-party components of this work must be honored.  Instructors
+ * interested in reusing these course materials should contact the
+ * author.
+ */
+
 import React, {Component} from 'react';
 import "./App.css";
-import TextInput from "./components/TextInput";
-// import "react-widgets/dist/css/react-widgets.css";
+import Map from "./Map";
+import { DropdownList } from 'react-widgets'
+import "react-widgets/dist/css/react-widgets.css";
 
 interface AppState {
-    uid:string;
     preferences:string;
+    uID:string;
 }
 
 class App extends Component<{}, AppState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            uid: "",
             preferences: "",
+            uID: "",
         };
 
-        //this.requestID();
-        //this.requestPreferences(); // used to be requestBuildings
-    }
-
-    componentDidMount() {
-        // Do any one-time setup here, when the app has just loaded
+        this.requestID();
+        this.requestPreferences(); // used to be requestBuildings
     }
 
     // get user name
@@ -34,9 +42,9 @@ class App extends Component<{}, AppState> {
                 return;
             }
             //we know its an ArrayList of Strings, so convert it and assign it to buildingsList
-            const uid = await response.json() as string;
+            const uID = await response.json() as string;
             this.setState({
-                uid: uid,
+                uID: uID
             });
         } catch (e) {
             alert("There was an error contacting the server.");
@@ -104,26 +112,16 @@ class App extends Component<{}, AppState> {
     clear = () => {
         this.setState({
             preferences: "",
-            uid: "",
+            uID: "",
         });
     };
-
-    // Updates uid; sets state
-    updateUserId: (s: string) => void = (inputUid: string) => {
-        this.setState({
-            uid: inputUid,
-        });
-    }
 
     //render the components on the site
     render() {
         return (
-            <div id="App">
-                <p id="app-title">App Title</p>
-                <TextInput
-                    inputValue={"unset id *replace w/ empty string*"}
-                    onSubmit={this.updateUserId}
-                />
+            <div className="App">
+                <p>Enter User id:</p>
+                
             </div>
         );
     }
