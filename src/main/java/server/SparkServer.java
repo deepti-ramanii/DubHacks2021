@@ -1,6 +1,6 @@
-package components.Server;
+package server;
 
-import database.*;
+import server.data.*;
 import com.google.gson.Gson;
 import spark.Request;
 import spark.Response;

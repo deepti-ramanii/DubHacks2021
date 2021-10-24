@@ -60,13 +60,11 @@ class Form extends Component<{}, FormState> {
     };
 
     AddUser = async () => {
-        alert("called add user");
         let response = await fetch('http://localhost:3000/add-user?user_id=' + this.state.user_id +
                                                                           '&age=' + this.state.player_age +
                                                                   '&competitive=' + this.state.competitive +
                                                                       '&uses_vc=' + this.state.uses_vc +
                                                                   '&likes_anime=' +  this.state.likes_anime);
-        alert(JSON.stringify(response.json()));
         if (!response.ok) {
             alert("The status is wrong! Expected: 200, Was: " + response.status);
             return;

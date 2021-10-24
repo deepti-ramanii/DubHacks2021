@@ -1,4 +1,4 @@
-package database;
+package server.data;
 
 import java.util.Arrays;
 

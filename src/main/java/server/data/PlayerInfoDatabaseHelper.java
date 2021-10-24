@@ -1,4 +1,4 @@
-package database;
+package server.data;
 
 import java.sql.*;
 
@@ -45,13 +45,10 @@ public class PlayerInfoDatabaseHelper {
 
     // try connecting to the database using the format: jdbc:mysql://host_name:port/database_name
     public static void connect() {
-        String URL = "jdbc:mysql://" + SERVER_NAME + "/" + DATABASE_NAME;
+        String URL = "jdbc:mysql://" + SERVER_NAME + "/" + DATABASE_NAME + "?characterEncoding=latin1";
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(URL, SERVER_USERNAME, SERVER_PASSWORD);
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

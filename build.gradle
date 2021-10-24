@@ -1,0 +1,21 @@
+plugins {
+  id 'java'
+  id 'groovy'
+}
+
+task runSpark(type: JavaExec) {
+  group = "runServer"
+  main = "server/SparkServer"
+  standardInput = System.in
+  classpath = sourceSets.main.runtimeClasspath
+}
+dependencies {
+  implementation 'com.google.code.gson:gson:2.8.8'
+  implementation 'com.sparkjava:spark-core:2.9.3'
+  implementation 'org.slf4j:slf4j-simple:1.7.32'
+  implementation 'mysql:mysql-connector-java:5.1.6'
+}
+
+repositories {
+  mavenCentral()
+}
