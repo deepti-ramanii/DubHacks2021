@@ -1,14 +1,8 @@
 import React, {Component} from "react";
-import UserIDInput from "./Components/UserIDInput";
-import AgeInput from "./Components/AgeInput";
-import PlaystyleInput from "./Components/PlaystyleInput";
-import AgePrefInput from "./Components/AgePrefInput";
-import PlaystylePrefInput from "./Components/PlaystylePrefInput";
-import HobbyInput from "./Components/HobbyInput";
 import CreateAccountForm from "./CreateAccountForm";
 import UpdatePreferencesMatchingForm from "./UpdatePreferencesMatchingForm";
-import {log} from "util";
 import Game from "./Game";
+import UserMatchPolling from "./Components/UserMatchPolling";
 
 interface MainScreenState {
     user_id: string;
@@ -41,6 +35,10 @@ class MainScreen extends Component<MainScreenProps, MainScreenState> {
     };
 
     GetMatched = async () => {
+        if (this.state.is_matched) {
+            return;
+        }
+
         let response = await fetch('http://localhost:4567/get-is-matched?user_id=' + this.state.user_id);
         if (!response.ok) {
             alert("The status is wrong! Expected: 200, Was: " + response.status);
@@ -52,7 +50,6 @@ class MainScreen extends Component<MainScreenProps, MainScreenState> {
             this.setState({
                 is_matched:true
             });
-            alert('Successfully matched!');
         }
     };
 
@@ -61,8 +58,6 @@ class MainScreen extends Component<MainScreenProps, MainScreenState> {
             return <CreateAccountForm updateUserID={this.updateUserID}/>;
         }
         else if (!this.state.is_matched) {
-            const response = this.GetMatched();
-            alert('called get matched');
             return <UpdatePreferencesMatchingForm user_id={this.state.user_id}/>;
         }
         else {
@@ -75,6 +70,7 @@ class MainScreen extends Component<MainScreenProps, MainScreenState> {
         return (
             <div>
                 <this.ChooseDisplay/>
+                <UserMatchPolling CheckMatchStatus={this.GetMatched}/>
             </div>
         );
     }

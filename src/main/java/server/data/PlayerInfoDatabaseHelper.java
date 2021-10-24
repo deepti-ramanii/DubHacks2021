@@ -91,8 +91,8 @@ public class PlayerInfoDatabaseHelper {
             return false;
         }
         String checkIsMatchedQuery = "SELECT " + IS_MATCHED +
-                " FROM " + TABLE_NAME +
-                " WHERE " + PLAYER_ID + " = ?";
+                                     " FROM " + TABLE_NAME +
+                                     " WHERE " + PLAYER_ID + " = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(checkIsMatchedQuery);
             statement.setString(1, user_id);
@@ -111,7 +111,7 @@ public class PlayerInfoDatabaseHelper {
             return false;
         }
         String setMatchedQuery = "UPDATE " + TABLE_NAME +
-                                 " SET " + IS_MATCHED + " = ?, " +
+                                 " SET " + IS_MATCHED + " = ?" +
                                  " WHERE " + PLAYER_ID  + " = ?";
         try {
             PreparedStatement statement = connection.prepareStatement(setMatchedQuery);
