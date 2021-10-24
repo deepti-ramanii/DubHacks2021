@@ -7,30 +7,42 @@ import PlaystylePrefInput from "./Components/PlaystylePrefInput";
 import HobbyInput from "./Components/HobbyInput";
 import CreateAccountForm from "./CreateAccountForm";
 import UpdatePreferencesMatchingForm from "./UpdatePreferencesMatchingForm";
+import {log} from "util";
 
 interface MainScreenState {
     user_id: string;
     is_logged_in:boolean;
 }
 
+interface MainScreenProps {
+
+}
+
 /**
  * CreateAccountForm allows user to input string.
  */
-class MainScreen extends Component<{}, MainScreenState> {
-    constructor(props: any) {
+class MainScreen extends Component<MainScreenProps, MainScreenState> {
+    constructor(props: MainScreenProps) {
         super(props);
         this.state = {
-            user_id: "",
+            user_id:'',
             is_logged_in:false
         };
     }
+
+    updateUserID = (id: string, logged_in: boolean):void  => {
+        this.setState({
+            user_id: id,
+            is_logged_in: logged_in
+        });
+    };
 
     ChooseDisplay = () => {
         if (this.state.is_logged_in) {
             return <UpdatePreferencesMatchingForm user_id={this.state.user_id}/>;
         }
-        return <CreateAccountForm/>;
-    }
+        return <CreateAccountForm updateUserID={this.updateUserID}/>;
+    };
 
     // RENDERING METHODS ---------------------------------------------------------------------------
     render() {

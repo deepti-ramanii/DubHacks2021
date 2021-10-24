@@ -78,11 +78,13 @@ class UpdatePreferencesMatchingForm extends Component<UpdatePrefsMatchingFormPro
         const successful = JSON.stringify(responsePath);
         if (successful != 'true') {
             alert('Invalid username. Please try again.');
+            return;
         }
+        alert('Successfully updated preferences.');
     };
 
     FindMatch = async () => {
-        let response = await fetch('http://localhost:4567/update-preferences?user_id=' + this.props.user_id);
+        let response = await fetch('http://localhost:4567/get-match?user_id=' + this.props.user_id);
         if (!response.ok) {
             alert("The status is wrong! Expected: 200, Was: " + response.status);
             return;
@@ -90,7 +92,7 @@ class UpdatePreferencesMatchingForm extends Component<UpdatePrefsMatchingFormPro
         let responsePath = await response.json();
         const playerMatch = JSON.stringify(responsePath);
         if (playerMatch === 'true') {
-            alert('Found ' + playerMatch);
+            alert('Successfully matched with ' + playerMatch);
         } else {
             alert('No matches found.');
         }

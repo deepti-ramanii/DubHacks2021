@@ -13,11 +13,15 @@ interface CreateAccountFormState {
     likes_anime: boolean;
 }
 
+interface CreateAccountFormProps {
+    updateUserID: (id:string, logged_in:boolean) => void;
+}
+
 /**
  * CreateAccountForm allows user to input string.
  */
-class CreateAccountForm extends Component<{}, CreateAccountFormState> {
-    constructor(props: any) {
+class CreateAccountForm extends Component<CreateAccountFormProps, CreateAccountFormState> {
+    constructor(props: CreateAccountFormProps) {
         super(props);
         this.state = {
             user_id: "",
@@ -80,7 +84,10 @@ class CreateAccountForm extends Component<{}, CreateAccountFormState> {
         const successful = JSON.stringify(responsePath);
         if (successful != 'true') {
             alert('Username already taken. Please try again.');
+            return;
         }
+        this.props.updateUserID(this.state.user_id, true);
+        alert('Successfully logged in. Welcome, ' + this.state.user_id);
     };
 
     // RENDERING METHODS ---------------------------------------------------------------------------
