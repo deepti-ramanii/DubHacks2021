@@ -6,11 +6,23 @@ import java.util.*;
 public class PlayerMatcher {
     // TODO: has to be at least a 75% match, otherwise keep waiting
     // public static final float MIN_MATCH_LEVEL = 0.75f;
+    public static PlayerMatcher instance;
 
     public static PlayerInfoDatabaseHelper playerInfoDB = PlayerInfoDatabaseHelper.getInstance();
 
     // store all players waiting for a match (queue -> first player is
-    public Set<String> waitingPlayersUsingPrefs =  new HashSet<String>();
+    public Set<String> waitingPlayersUsingPrefs;
+
+    public static synchronized PlayerMatcher getInstance() {
+        if (instance == null) {
+            instance = new PlayerMatcher();
+        }
+        return instance;
+    }
+
+    private PlayerMatcher() {
+        this.waitingPlayersUsingPrefs = new HashSet<String>();
+    }
 
     // returns the id of the other player to match with if there's a good match,
     // returns null otherwise
@@ -73,10 +85,13 @@ public class PlayerMatcher {
 
         if (matchLevels.keySet().size() <= 0) {
             waitingPlayersUsingPrefs.add(currPlayerID);
+            playerInfoDB.setMatched(currPlayerID, false);
             return null;
         }
         String otherPlayerID = matchLevels.firstEntry().getValue();
         waitingPlayersUsingPrefs.remove(otherPlayerID);
+        playerInfoDB.setMatched(currPlayerID, true);
+        playerInfoDB.setMatched(otherPlayerID, true);
         return otherPlayerID;
     }
 }

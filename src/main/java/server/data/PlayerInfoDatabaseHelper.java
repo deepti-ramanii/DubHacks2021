@@ -24,6 +24,9 @@ public class PlayerInfoDatabaseHelper {
     public static final String[] PLAYSTYLE_PREFS = { "competitive_pref", "uses_vc_pref" };          // array of player playstyle preferences (default: false)
     public static final String MATCH_USING_HOBBIES = "match_using_hobbies";                         // matching type preferred (default: false)
 
+    // player matching columns
+    public static final String IS_MATCHED = "is_matched";
+
     // connection to server where database is located
     private static Connection connection = null;
 
@@ -81,6 +84,45 @@ public class PlayerInfoDatabaseHelper {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean isMatched(String user_id) {
+        if (!isInTable(user_id)) {
+            return false;
+        }
+        String checkIsMatchedQuery = "SELECT " + IS_MATCHED +
+                " FROM " + TABLE_NAME +
+                " WHERE " + PLAYER_ID + " = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(checkIsMatchedQuery);
+            statement.setString(1, user_id);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean setMatched(String user_id, boolean is_matched) {
+        if (!isInTable(user_id)) {
+            return false;
+        }
+        String setMatchedQuery = "UPDATE " + TABLE_NAME +
+                                 " SET " + IS_MATCHED + " = ?, " +
+                                 " WHERE " + PLAYER_ID  + " = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(setMatchedQuery);
+            statement.setBoolean(1, is_matched);
+            statement.setString(2, user_id);
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e)  {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // add user id to table  w/ associated preferences set to null

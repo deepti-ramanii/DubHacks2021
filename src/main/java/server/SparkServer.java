@@ -9,7 +9,7 @@ import spark.Spark;
 
 public class SparkServer {
     private static PlayerInfoDatabaseHelper dbHelper = PlayerInfoDatabaseHelper.getInstance();
-    private static PlayerMatcher matcher = new PlayerMatcher();
+    private static PlayerMatcher matcher = PlayerMatcher.getInstance();
     private static Gson gson;
 
     public static void main(String[] args) {
@@ -112,6 +112,37 @@ public class SparkServer {
                 // try getting a match
                 String foundMatch = matcher.matchUsingPrefs(user_id);
                 return gson.toJson(foundMatch);
+            }
+        });
+
+        Spark.get("get-is-matched", new Route() {
+            @Override
+            public Object handle(Request request, Response response) throws Exception {
+                // get input and check validity
+                String user_id = request.queryParams("user_id");
+                if (user_id == null) {
+                    Spark.halt(400, "user id must be valid");
+                }
+
+                // try getting a match
+                boolean isMatched = dbHelper.isMatched(user_id);
+                return gson.toJson(isMatched);
+            }
+        });
+
+        Spark.get("update-is-matched", new Route() {
+            @Override
+            public Object handle(Request request, Response response) throws Exception {
+                // get input and check validity
+                String user_id = request.queryParams("user_id");
+                boolean is_matched = Boolean.parseBoolean(request.queryParams("is_matched"));
+                if (user_id == null) {
+                    Spark.halt(400, "user id must be valid");
+                }
+
+                // try getting a match
+                boolean updateMatchSuccessful = dbHelper.setMatched(user_id, is_matched);
+                return gson.toJson(updateMatchSuccessful);
             }
         });
     }
