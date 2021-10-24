@@ -1,4 +1,4 @@
-package components;
+package components.Server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +11,6 @@ import java.util.HashMap;
 
 
 public class CORSFilter {
-
-    // ===============
-    // You don't need to understand how this works at all, but it's something that's necessary
-    // for our two-server system to work nicely together. If you're curious, read the comments
-    // in this class and do some searching for "CORS", "Cross-Site Scripting", and "XSS" online.
-    // ===============
-
     /**
      * Contains all the headers that need to be added
      */

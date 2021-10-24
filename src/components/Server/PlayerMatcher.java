@@ -1,6 +1,6 @@
-package components;
-import database.*;
+package components.Server;
 
+import database.*;
 import java.util.*;
 
 public class PlayerMatcher {
