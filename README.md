@@ -1,4 +1,4 @@
-# DubHacks2021
+# Game Matcher App (DubHacks 2021)
 
 App hackathon link: https://devpost.com/software/game-matching
 
