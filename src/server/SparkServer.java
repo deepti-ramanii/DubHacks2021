@@ -42,7 +42,7 @@ public class SparkServer {
                 if (!addUserSuccessful) {
                     Spark.halt(400, "user id already taken");
                 }
-                return null;
+                return gson.toJson("Added user!");
             }
         });
 

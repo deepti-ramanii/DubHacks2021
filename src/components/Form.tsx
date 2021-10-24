@@ -2,14 +2,6 @@ import React, {Component} from "react";
 import UserIDInput from "./UserIDInput";
 import AgeInput from "./AgeInput";
 import PlaystyleInput from "./PlaystyleInput";
-import {Buffer} from "buffer";
-
-/*
-
-Using this component:
-https://www.thisdot.co/blog/composing-react-components-with-typescript
-look at the "input" section
- */
 
 interface FormState {
     user_id: string;
@@ -68,11 +60,13 @@ class Form extends Component<{}, FormState> {
     };
 
     AddUser = async () => {
+        alert("called add user");
         let response = await fetch('http://localhost:3000/add-user?user_id=' + this.state.user_id +
                                                                           '&age=' + this.state.player_age +
                                                                   '&competitive=' + this.state.competitive +
                                                                       '&uses_vc=' + this.state.uses_vc +
                                                                   '&likes_anime=' +  this.state.likes_anime);
+        alert(JSON.stringify(response.json()));
         if (!response.ok) {
             alert("The status is wrong! Expected: 200, Was: " + response.status);
             return;
@@ -107,12 +101,18 @@ class Form extends Component<{}, FormState> {
     // RENDERING METHODS ---------------------------------------------------------------------------
     render() {
         return (
-            <div id="form">
-                <span id="form-label">Add User Info here.</span>
-                <UserIDInput user_id={this.state.user_id} setUID={this.setUserId}/>
-                <AgeInput player_age={this.state.player_age} setAge={this.setAge}/>
-                <PlaystyleInput toggleCompetitive={this.setCompetitive} toggleUsesVC={this.setUsesVC}/>
-                <button onClick={this.AddUser}>Submit</button>
+            <div>
+                <div id="name">
+                    <span id="form-label">Add User Info here.</span>
+                </div>
+                <div id="inputs">
+                    <UserIDInput user_id={this.state.user_id} setUID={this.setUserId}/>
+                    <AgeInput player_age={this.state.player_age} setAge={this.setAge}/>
+                </div>
+                <div id="checkboxes">
+                    <PlaystyleInput toggleCompetitive={this.setCompetitive} toggleUsesVC={this.setUsesVC}/>
+                    <button onClick={this.AddUser}>Submit</button>
+                </div>
             </div>
         );
     }
