@@ -4,33 +4,35 @@ import database.*;
 import java.util.*;
 
 public class PlayerMatcher {
-    // has to be at least a 75% match, otherwise keep waiting
-    public static final float MIN_MATCH_LEVEL = 0.75f;
+    // TODO: has to be at least a 75% match, otherwise keep waiting
+    // public static final float MIN_MATCH_LEVEL = 0.75f;
 
     public static PlayerInfoDatabaseHelper playerInfoDB = PlayerInfoDatabaseHelper.getInstance();
 
     // store all players waiting for a match (queue -> first player is
-    public Queue<String> waitingPlayers =  new LinkedList<String>();
+    public Set<String> waitingPlayersUsingPrefs =  new HashSet<String>();
 
-    public void addToQueue(String id) {
-        waitingPlayers.add(id);
-    }
+    // store all players who want random matching (priority queue: first added = first to match)
+    public Queue<String> waitingPlayersNoPrefs = new LinkedList<String>();
 
     // returns the id of the other player to match with if there's a good match,
     // returns null otherwise
-    public String match(String currPlayerID) {
+    public String matchUsingPrefs(String currPlayerID) {
+        // get curr info + prefs
+        UserInfo currInfo = playerInfoDB.getInfo(currPlayerID);
+        UserPreferences currPrefs = playerInfoDB.getPreferences(currPlayerID);
+
         // get match levels
         TreeMap<Float, String> matchLevels =  new TreeMap<Float, String>();
-        for (String otherPlayerID : waitingPlayers) {
-            UserInfo currInfo = playerInfoDB.getInfo(currPlayerID);
-            UserPreferences currPrefs = playerInfoDB.getPreferences(currPlayerID);
+
+        // compare against other players waiting for matches
+        for (String otherPlayerID : waitingPlayersUsingPrefs) {
             UserInfo otherInfo = playerInfoDB.getInfo(otherPlayerID);
             UserPreferences otherPrefs = playerInfoDB.getPreferences(otherPlayerID);
 
             float numMatchingPrefs = 0.0f;
-            float numTotalPrefs  = 1 + currInfo.playstyleInfo.length + currInfo.hobbyInfo.length;
+            float numTotalPrefs  = 1 + currInfo.playstyleInfo.length + (currPrefs.matchUsingHobbies ? currInfo.hobbyInfo.length : 0);
 
-            // TODO: weighted the preferences better?
             // check age
             if (currInfo.age < otherPrefs.maxAge && currInfo.age > otherPrefs.minAge) {
                 numMatchingPrefs += 0.5f;
@@ -55,14 +57,21 @@ public class PlayerMatcher {
                     numMatchingPrefs += 1.0f;
                 }
             }
+
+            // save match level
             matchLevels.put((numMatchingPrefs / numTotalPrefs), otherPlayerID);
         }
 
-        // check if there's a good match
-        float highestMatch = waitingPlayers.size() > 0 ? matchLevels.firstKey(): 0.0f;
-        if (highestMatch >= MIN_MATCH_LEVEL) {
-            return matchLevels.get(highestMatch);
+        // TODO: if a match above a certain level isn't found, add curr player to waiting players and wait
+        //  -> when a player that matches them finally gets added, then return for both
+        //  -> how to do this?????
+
+        if (matchLevels.keySet().size() <= 0) {
+            waitingPlayersUsingPrefs.add(currPlayerID);
+            return null;
         }
-        return null;
+        String otherPlayerID = matchLevels.firstEntry().getValue();
+        waitingPlayersUsingPrefs.remove(otherPlayerID);
+        return otherPlayerID;
     }
 }
